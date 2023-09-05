@@ -25,67 +25,40 @@ unsigned f2u(float f) {
   return a.u;
 }
 
-//1
-int test_bitXor(int x, int y)
-{
-  return x^y;
-}
-int test_tmin(void) {
-  return 0x80000000;
-}
-//2
-int test_isTmax(int x) {
-    return x == 0x7FFFFFFF;
-}
+// 1
+int test_bitXor(int x, int y) { return x ^ y; }
+int test_tmin(void) { return 0x80000000; }
+// 2
+int test_isTmax(int x) { return x == 0x7FFFFFFF; }
 int test_allOddBits(int x) {
   int i;
-  for (i = 1; i < 32; i+=2)
-      if ((x & (1<<i)) == 0)
-   return 0;
+  for (i = 1; i < 32; i += 2)
+    if ((x & (1 << i)) == 0)
+      return 0;
   return 1;
 }
 
+int test_negate(int x) { return -x; }
+// 3
 
-
-
-
-
-
-int test_negate(int x) {
-  return -x;
-}
-//3
-
-
-int test_isAsciiDigit(int x) {
-  return (0x30 <= x) && (x <= 0x39);
-}
-int test_conditional(int x, int y, int z)
-{
-  return x?y:z;
-}
-int test_isLessOrEqual(int x, int y)
-{
-  return x <= y;
-}
-//4
-int test_logicalNeg(int x)
-{
-  return !x;
-}
+int test_isAsciiDigit(int x) { return (0x30 <= x) && (x <= 0x39); }
+int test_conditional(int x, int y, int z) { return x ? y : z; }
+int test_isLessOrEqual(int x, int y) { return x <= y; }
+// 4
+int test_logicalNeg(int x) { return !x; }
 int test_howManyBits(int x) {
-    unsigned int a, cnt;
-    x = x<0 ? -x-1 : x;
-    a = (unsigned int)x;
-    for (cnt=0; a; a>>=1, cnt++)
-        ;
+  unsigned int a, cnt;
+  x = x < 0 ? -x - 1 : x;
+  a = (unsigned int)x;
+  for (cnt = 0; a; a >>= 1, cnt++)
+    ;
 
-    return (int)(cnt + 1);
+  return (int)(cnt + 1);
 }
-//float
+// float
 unsigned test_floatScale2(unsigned uf) {
   float f = u2f(uf);
-  float tf = 2*f;
+  float tf = 2 * f;
   if (isnan(f))
     return uf;
   else
@@ -93,7 +66,7 @@ unsigned test_floatScale2(unsigned uf) {
 }
 int test_floatFloat2Int(unsigned uf) {
   float f = u2f(uf);
-  int x = (int) f;
+  int x = (int)f;
   return x;
 }
 unsigned test_floatPower2(int x) {
@@ -102,7 +75,7 @@ unsigned test_floatPower2(int x) {
   int recip = (x < 0);
   /* treat tmin specially */
   if ((unsigned)x == 0x80000000) {
-      return 0;
+    return 0;
   }
   if (recip) {
     x = -x;
