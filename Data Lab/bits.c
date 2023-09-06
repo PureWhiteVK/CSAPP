@@ -271,16 +271,63 @@ int howManyBits(int x) {
   // 首先计算出 x 的 绝对值，然后 - 1
   // x = x > 0 ? x : ~x
   // x > 0 就直接判断 !(x >> 31) -> x 为 负数时为 1， x 为正数时为 0
-  int a = !(x >> 31);
-  int b = x;
-  int c = ~x;
-  int mask = ~0 + !a;
-  int d = (mask & b) | ((~mask) & c);
-  int count = 0;
-  printf("x = %d, x > 0 ? x : -x - 1 = %d\n", x, d);
-  // 然后就开始 bitcount
-  
-  return 0;
+  // 0xffffffff
+  int negative_one = ~0;
+  int condition_mask = negative_one + !(x >> 31);
+  int bit_mask = 0;
+  int upper_half = 0;
+  int count = 16;
+  x = (~condition_mask & x) | (condition_mask & ~x);
+
+  // step1. judge 16 bits level
+  // 0b1111'1111'1111'1111
+  bit_mask = 0xff | (0xff << 8);
+  upper_half = (x >> 16) & bit_mask;
+  condition_mask = negative_one + !upper_half;
+  count += (~condition_mask & (~8 + 1)) | (condition_mask & 8);
+  x = (~condition_mask & (x & bit_mask)) | (condition_mask & upper_half);
+  // count += upper_half ? 8 : (~8 + 1);
+  // x = upper_half ? upper_half : (x & bit_mask);
+  // printf("count = %d\n",count);
+  // step2. judge 8 bits level
+  // 0b1111'1111
+  upper_half = (x >> 8) & 0xff;
+  condition_mask = negative_one + !upper_half;
+  count += (~condition_mask & (~4 + 1)) | (condition_mask & 4);
+  x = (~condition_mask & (x & bit_mask)) | (condition_mask & upper_half);
+  // count += upper_half ? 4 : (~4 + 1);
+  // x = upper_half ? upper_half : (x & 0xff);
+  // printf("count = %d\n",count);
+
+  // step3. judge 4 bits level
+  // 0b1111
+  upper_half = (x >> 4) & 0xf;
+  condition_mask = negative_one + !upper_half;
+  count += (~condition_mask & (~2 + 1)) | (condition_mask & 2);
+  x = (~condition_mask & (x & bit_mask)) | (condition_mask & upper_half);
+  // count += upper_half ? 2 : (~2 + 1);
+  // x = upper_half ? upper_half : (x & 0xf);
+  // printf("count = %d\n",count);
+
+  // step4. judge 2 bits level
+  // 0b11
+  upper_half = (x >> 2) & 0x3;
+  condition_mask = negative_one + !upper_half;
+  count += (~condition_mask & (negative_one)) | (condition_mask & 1);
+  x = (~condition_mask & (x & bit_mask)) | (condition_mask & upper_half);
+  // count += upper_half ? 1 : negative_one;
+  // x = upper_half ? upper_half : (x & 0x3);
+  // printf("count = %d\n",count);
+
+  // step5. judge 1 bits level
+  // upper_half = (x >> 1) & 0x1;
+  // count += !upper_half ? 0 : 1;
+  count += (x >> 1) & 1;
+
+  // step6. judge 0
+  // count += x ? 0 : negative_one;
+  count += (~(negative_one + !x) & negative_one);
+  return count + 1;
 }
 // float
 /*
