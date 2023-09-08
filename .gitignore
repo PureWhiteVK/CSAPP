@@ -1,6 +1,13 @@
 .vscode
 *.a
 *.o
+# output by Data Lab
 btest
 fshow
 ishow
+# output by Shell Lab
+myint
+myspin
+mysplit
+mystop
+tsh
