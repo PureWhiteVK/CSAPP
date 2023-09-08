@@ -1,0 +1,147 @@
+{
+  // 使用 IntelliSense 了解相关属性。 
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Shell Lab / myint",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/Shell Lab/myint",
+      "args": [
+        // will sleep 3 seconds, and sent SIGINT to itself.
+        "3"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/Shell Lab",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "为 gdb 启用整齐打印",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "将反汇编风格设置为 Intel",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
+      "name": "Shell Lab / myspin",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/Shell Lab/myspin",
+      "args": [
+        // will sleep 3 seconds, and exit.
+        "3"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/Shell Lab",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "为 gdb 启用整齐打印",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "将反汇编风格设置为 Intel",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
+      "name": "Shell Lab / mysplit",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/Shell Lab/mysplit",
+      "args": [
+        // will create a child process and make it sleep for 3 seconds, the main process will wait for it and exit.
+        "3"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/Shell Lab",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "为 gdb 启用整齐打印",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "将反汇编风格设置为 Intel",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
+      "name": "Shell Lab / mystop",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/Shell Lab/mystop",
+      "args": [
+        // mock Ctrl + Z input
+        // SIGTSTP: Stop typed at terminal
+        // will sleep 3 seconds, and sent SIGTSTP to itself.
+        "3"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/Shell Lab",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "为 gdb 启用整齐打印",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "将反汇编风格设置为 Intel",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
+      "name": "Shell Lab / tsh",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/Shell Lab/tsh",
+      "args": [
+        // mock Ctrl + Z input
+        // SIGTSTP: Stop typed at terminal
+        // will sleep 3 seconds, and sent SIGTSTP to itself.
+        "-v"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/Shell Lab",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "为 gdb 启用整齐打印",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "将反汇编风格设置为 Intel",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}

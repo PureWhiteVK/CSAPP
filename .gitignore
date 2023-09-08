@@ -1,4 +1,6 @@
-.vscode
+.vscode/**
+# for debug
+!.vscode/launch.json
 *.a
 *.o
 # output by Data Lab
