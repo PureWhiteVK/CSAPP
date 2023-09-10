@@ -6,10 +6,10 @@ VERSION = 1
 HANDINDIR = /afs/cs.cmu.edu/academic/class/15213-f01/malloclab/handin
 
 CC = gcc
-# CFLAGS = -Wall -O2 -m32
-CFLAGS = -Wall -m32 -g
+CFLAGS = -Wall -O2 -m32
+# CFLAGS = -Wall -m32 -g
 
-OBJS = mdriver.o mm.o memlib.o fsecs.o fcyc.o clock.o ftimer.o
+OBJS = mdriver.o mm-implicit.o memlib.o fsecs.o fcyc.o clock.o ftimer.o
 
 mdriver: $(OBJS)
 	$(CC) $(CFLAGS) -o mdriver $(OBJS)
@@ -17,6 +17,9 @@ mdriver: $(OBJS)
 mdriver.o: mdriver.c fsecs.h fcyc.h clock.h memlib.h config.h mm.h
 memlib.o: memlib.c memlib.h
 mm.o: mm.c mm.h memlib.h
+mm-native.o: mm-native.c mm.h memlib.h
+mm-implicit.o: mm-implicit.c mm.h memlib.h
+mm-implicit-op.o: mm-implicit-op.c mm.h memlib.h
 fsecs.o: fsecs.c fsecs.h config.h
 fcyc.o: fcyc.c fcyc.h
 ftimer.o: ftimer.c ftimer.h config.h
@@ -28,4 +31,12 @@ handin:
 clean:
 	rm -f *~ *.o mdriver
 
+test:
+	./mdriver -t ./traces -v -V -l
+
+test-short1:
+	./mdriver -f short1-bal.rep -v -V -l
+
+test-short2:
+	./mdriver -f short2-bal.rep -v -V -l
 

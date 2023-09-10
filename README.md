@@ -131,3 +131,69 @@ Result
 > [2] (26970) Running ./myspin 4 &
 
 ```
+
+## Malloc Lab
+
+### Compile and Run
+```bash
+make mdriver
+./mdriver -t ./traces -v -V -l
+```
+
+### traces files
+
+ 0. `amptjp-bal.rep`
+ 1. `cccp-bal.rep`
+ 2. `cp-decl-bal.rep`
+ 3. `expr-bal.rep`
+ 4. `coalescing-bal.rep`
+ 5. `random-bal.rep`
+ 6. `random2-bal.rep`
+ 7. `binary-bal.rep`
+ 8. `binary2-bal.rep`
+ 9. `realloc-bal.rep`
+10. `realloc2-bal.rep`
+
+### Implicit Free Lists (with First Fit)
+
+```txt
+Results for mm malloc:
+trace  valid  util     ops      secs  Kops
+ 0       yes   99%    5694  0.004763  1195
+ 1       yes   99%    5848  0.004549  1286
+ 2       yes   99%    6648  0.006962   955
+ 3       yes   99%    5380  0.005181  1038
+ 4       yes   66%   14400  0.000073196721
+ 5       yes   93%    4800  0.004629  1037
+ 6       yes   91%    4800  0.004741  1013
+ 7       yes   54%    6000  0.016835   356
+ 8       yes   47%    7200  0.020737   347
+ 9       yes   27%   14401  0.032043   449
+10       yes   34%   14401  0.001033 13946
+Total          73%   89572  0.101547   882
+
+Perf index = 44 (util) + 40 (thru) = 84/100
+```
+
+### Implicit Free Lists with Optimized Footer (with First Fit)
+
+```txt
+Results for mm malloc:
+trace  valid  util     ops      secs  Kops
+ 0       yes   99%    5694  0.004824  1180
+ 1       yes   99%    5848  0.004451  1314
+ 2       yes   99%    6648  0.006826   974
+ 3       yes   99%    5380  0.005047  1066
+ 4       yes   66%   14400  0.000083172662
+ 5       yes   93%    4800  0.004592  1045
+ 6       yes   92%    4800  0.004688  1024
+ 7       yes   55%    6000  0.017217   348
+ 8       yes   51%    7200  0.019659   366
+ 9       yes   27%   14401  0.032257   446
+10       yes   34%   14401  0.001046 13773
+Total          74%   89572  0.100689   890
+
+Perf index = 44 (util) + 40 (thru) = 84/100
+```
+
+### Explicit Free Lists
