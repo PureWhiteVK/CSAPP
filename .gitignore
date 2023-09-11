@@ -16,3 +16,7 @@ tsh
 Shell Lab/output
 # output by Malloc Lab
 mdriver
+# output by Proxy Lab
+proxy
+tiny
+adder
