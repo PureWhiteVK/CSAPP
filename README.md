@@ -134,13 +134,15 @@ Result
 
 ## Malloc Lab
 
+the free block matching policy is `First Fit`
+
 ### Compile and Run
 ```bash
 make mdriver
 ./mdriver -t ./traces -v -V -l
 ```
 
-### traces files
+### Traces Files (under `./Malloc Lab/traces`)
 
  0. `amptjp-bal.rep`
  1. `cccp-bal.rep`
@@ -154,7 +156,7 @@ make mdriver
  9. `realloc-bal.rep`
 10. `realloc2-bal.rep`
 
-### Implicit Free Lists (with First Fit)
+### Implicit Free Lists
 
 ```txt
 Results for mm malloc:
@@ -175,7 +177,9 @@ Total          73%   89572  0.101547   882
 Perf index = 44 (util) + 40 (thru) = 84/100
 ```
 
-### Implicit Free Lists with Optimized Footer (with First Fit)
+### Implicit Free Lists with Optimized Footer
+
+we can see a slightly improvement on `util` field compared to native one 
 
 ```txt
 Results for mm malloc:
@@ -196,4 +200,28 @@ Total          74%   89572  0.100689   890
 Perf index = 44 (util) + 40 (thru) = 84/100
 ```
 
-### Explicit Free Lists
+### Explicit Free Lists with LIFO order and stand-alone `realloc`
+
+we can see a huge boost on `Kops` field compared with Implicit Free Lists method (but the Perf index mainly focuses on `util`) and better `util` metric under `realloc` trace file(due to stand-alone `realloc` implementation).
+
+```txt
+Results for mm malloc:
+trace  valid  util     ops      secs  Kops
+ 0       yes   88%    5694  0.000169 33772
+ 1       yes   92%    5848  0.000096 61044
+ 2       yes   94%    6648  0.000204 32556
+ 3       yes   96%    5380  0.000152 35371
+ 4       yes   66%   14400  0.000078183673
+ 5       yes   87%    4800  0.000387 12410
+ 6       yes   85%    4800  0.000387 12419
+ 7       yes   54%    6000  0.000236 25456
+ 8       yes   47%    7200  0.000113 64000
+ 9       yes   37%   14401  0.019387   743
+10       yes   45%   14401  0.000344 41900
+Total          72%   89572  0.021551  4156
+
+Perf index = 43 (util) + 40 (thru) = 83/100
+```
+
+### Segregated Free Lists
+

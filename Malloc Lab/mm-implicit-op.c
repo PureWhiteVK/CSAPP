@@ -24,7 +24,7 @@
  ********************************************************/
 team_t team = {
     /* Team name */
-    "Team White",
+    "No Team",
     /* First member's full name */
     "PureWhiteVK",
     /* First member's email address */
