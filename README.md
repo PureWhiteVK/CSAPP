@@ -223,5 +223,26 @@ Total          72%   89572  0.021551  4156
 Perf index = 43 (util) + 40 (thru) = 83/100
 ```
 
-### Segregated Free Lists
+### Segregated Free Lists with LIFO order, stand-alone `realloc`
+
+size classes: {1~32},{33~64},{65~128},{129~256},{257~512},{513~1024},{1025~2048},{2049~4096},{4097~inf}
+
+```txt
+Results for mm malloc:
+trace  valid  util     ops      secs  Kops
+ 0       yes   98%    5694  0.000175 32630
+ 1       yes   97%    5848  0.000197 29761
+ 2       yes   99%    6648  0.000210 31672
+ 3       yes   99%    5380  0.000167 32293
+ 4       yes   98%   14400  0.000228 63241
+ 5       yes   88%    4800  0.000292 16444
+ 6       yes   86%    4800  0.000251 19093
+ 7       yes   54%    6000  0.000155 38610
+ 8       yes   47%    7200  0.000151 47588
+ 9       yes   44%   14401  0.019650   733
+10       yes   46%   14401  0.000347 41442
+Total          78%   89572  0.021822  4105
+
+Perf index = 47 (util) + 40 (thru) = 87/100
+```
 

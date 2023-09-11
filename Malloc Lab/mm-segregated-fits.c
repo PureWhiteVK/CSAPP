@@ -54,20 +54,14 @@ struct ListNode {
 #define NODE_SIZE (sizeof(struct ListNode))
 #define MIN_BLOCK_SIZE (NODE_SIZE + DSIZE)
 #define EPILOGUE_BLOCK_SIZE (NODE_SIZE + WSIZE)
-
 #define CHUNK_SIZE (mem_pagesize())
 
 #define ALLOC_BIT 0x1
-
 #define PACK(size, alloc) ((size) | (alloc))
 #define GET(p) (*(size_t *)(p))
 #define SET(p, val) (GET(p) = (val))
 #define GET_SIZE(p) (GET(p) & ALIGNMENT_MASK)
 #define GET_ALLOC(p) (GET(p) & ALLOC_BIT)
-#define SET_SIZE(p, size)                                                      \
-  (GET(p) = (((size)&ALIGNMENT_MASK) | (GET(p) & ALLOC_BIT)))
-#define SET_ALLOC(p, alloc)                                                    \
-  (GET(p) = ((GET(p) & ALIGNMENT_MASK) | ((alloc)&ALLOC_BIT)))
 #define HEADER(bp) ((char *)(bp)-WSIZE)
 #define FOOTER(bp) ((char *)(bp) + GET_SIZE(HEADER(bp)) - DSIZE)
 #define NEXT_BLOCK(bp) ((char *)(bp) + GET_SIZE(HEADER(bp)))
@@ -75,16 +69,50 @@ struct ListNode {
 #define NODE(bp) ((node_ptr)(bp))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
-static node_ptr freelist_header;
+#define SIZE_CLASSES 9
 
-// #define DEBUG
+static size_t SIZE_CLASS_ID(size_t size) {
+  static size_t size_threasholds[] = {32, 64, 128, 256, 512, 1024, 2048, 4096};
+  size_t id = 0;
+  while (id < 8 && size > size_threasholds[id]) {
+    id++;
+  }
+  return id;
+}
 
-#ifdef DEBUG
-#define LOG(...) printf(__VA_ARGS__)
-#else
-#define LOG(...)                                                               \
-  {}
-#endif
+static const char *get_size_class_name(size_t class_id) {
+  static char buffer[1024];
+  switch (class_id) {
+  case 0:
+    sprintf(buffer, "{1~32}");
+    break;
+  case 1:
+    sprintf(buffer, "{33~64}");
+    break;
+  case 2:
+    sprintf(buffer, "{65~128}");
+    break;
+  case 3:
+    sprintf(buffer, "{129~256}");
+    break;
+  case 4:
+    sprintf(buffer, "{257~512}");
+    break;
+  case 5:
+    sprintf(buffer, "{513~1024}");
+    break;
+  case 6:
+    sprintf(buffer, "{1025~2048}");
+    break;
+  case 7:
+    sprintf(buffer, "{2049~4096}");
+    break;
+  case 8:
+    sprintf(buffer, "{4097~inf}");
+    break;
+  }
+  return buffer;
+}
 
 #define ATTACH(prev_node, node)                                                \
   do {                                                                         \
@@ -102,6 +130,21 @@ static node_ptr freelist_header;
     prev->next = next;                                                         \
     next->prev = prev;                                                         \
   } while (0)
+
+// #define DEBUG
+
+#ifdef DEBUG
+#define LOG(...) printf(__VA_ARGS__)
+#else
+#define LOG(...)                                                               \
+  {}
+#endif
+
+// pointer to freelist array
+static void *freelists;
+static void *heaplist_ptr;
+
+#define FREE_LIST(x) ((node_ptr)(freelists) + x)
 
 static void *coalesce(void *bp);
 static void *extend_heap(size_t size);
@@ -122,24 +165,38 @@ static size_t get_alloc(void *bp) { return GET_ALLOC(HEADER(bp)); }
  */
 int mm_init(void) {
   LOG("\nin %s\n", __func__);
-  /* Create the initial empty heap */
-  size_t initial_size = MIN_BLOCK_SIZE + EPILOGUE_BLOCK_SIZE;
+  // header / tail node + 1 prologue and 1 epilogue
+  size_t initial_size = 2 * SIZE_CLASSES * NODE_SIZE + DSIZE + WSIZE;
   char *bp;
   if ((bp = (char *)mem_sbrk(initial_size)) == (char *)-1) {
     return -1;
   }
+
+  freelists = bp;
+
+  // array for freelist headers
+  bp += SIZE_CLASSES * NODE_SIZE;
+
+  // populate headers and tails
+  for (size_t i = 0; i < SIZE_CLASSES; i++) {
+    node_ptr header = FREE_LIST(i);
+    node_ptr tail = NODE(bp);
+    header->next = tail;
+    header->prev = NULL;
+    tail->next = NULL;
+    tail->prev = header;
+    bp += NODE_SIZE;
+  }
+
+  // setup prologue and epologue
   char *prologue_block = bp + WSIZE;
-  SET(HEADER(prologue_block), PACK(MIN_BLOCK_SIZE, 1));
-  SET(FOOTER(prologue_block), PACK(MIN_BLOCK_SIZE, 1));
+  SET(HEADER(prologue_block), PACK(DSIZE, 1));
+  SET(FOOTER(prologue_block), PACK(DSIZE, 1));
   char *epilogue_block = NEXT_BLOCK(prologue_block);
   SET(HEADER(epilogue_block), PACK(0, 1));
-  node_ptr header = NODE(prologue_block);
-  node_ptr tail = NODE(epilogue_block);
-  header->prev = NULL;
-  header->next = tail;
-  tail->prev = header;
-  tail->next = NULL;
-  freelist_header = header;
+
+  // update heap list
+  heaplist_ptr = prologue_block;
 
   /* Extend the empty heap with a free block of CHUNK_SIZE bytes */
   // if (extend_heap(CHUNK_SIZE) == NULL) {
@@ -196,7 +253,7 @@ void mm_free(void *ptr) {
   print_freelist();
   SET(HEADER(ptr), PACK(size, 0));
   SET(FOOTER(ptr), PACK(size, 0));
-  ATTACH(freelist_header, NODE(ptr));
+  ATTACH(FREE_LIST(SIZE_CLASS_ID(size)), NODE(ptr));
   print_heaplist();
   print_freelist();
   coalesce(ptr);
@@ -236,7 +293,8 @@ void *mm_realloc(void *ptr, size_t size) {
       void *free_block = NEXT_BLOCK(ptr);
       SET(HEADER(free_block), PACK(total_size - payload_size, 0));
       SET(FOOTER(free_block), PACK(total_size - payload_size, 0));
-      ATTACH(freelist_header, NODE(free_block));
+      ATTACH(FREE_LIST(SIZE_CLASS_ID(total_size - payload_size)),
+             NODE(free_block));
     }
     print_freelist();
     print_heaplist();
@@ -257,7 +315,8 @@ void *mm_realloc(void *ptr, size_t size) {
       void *free_block = NEXT_BLOCK(ptr);
       SET(HEADER(free_block), PACK(total_size - payload_size, 0));
       SET(FOOTER(free_block), PACK(total_size - payload_size, 0));
-      ATTACH(freelist_header, NODE(free_block));
+      ATTACH(FREE_LIST(SIZE_CLASS_ID(total_size - payload_size)),
+             NODE(free_block));
     } else {
       SET(HEADER(ptr), PACK(total_size, 1));
       SET(FOOTER(ptr), PACK(total_size, 1));
@@ -284,7 +343,8 @@ void *mm_realloc(void *ptr, size_t size) {
       void *free_block = NEXT_BLOCK(prev_block);
       SET(HEADER(free_block), PACK(total_size - payload_size, 0));
       SET(FOOTER(free_block), PACK(total_size - payload_size, 0));
-      ATTACH(freelist_header, NODE(free_block));
+      ATTACH(FREE_LIST(SIZE_CLASS_ID(total_size - payload_size)),
+             NODE(free_block));
     } else {
       SET(HEADER(prev_block), PACK(total_size, 1));
       SET(FOOTER(prev_block), PACK(total_size, 1));
@@ -310,7 +370,8 @@ void *mm_realloc(void *ptr, size_t size) {
       void *free_block = NEXT_BLOCK(prev_block);
       SET(HEADER(free_block), PACK(total_size - payload_size, 0));
       SET(FOOTER(free_block), PACK(total_size - payload_size, 0));
-      ATTACH(freelist_header, NODE(free_block));
+      ATTACH(FREE_LIST(SIZE_CLASS_ID(total_size - payload_size)),
+             NODE(free_block));
     } else {
       SET(HEADER(prev_block), PACK(total_size, 1));
       SET(FOOTER(prev_block), PACK(total_size, 1));
@@ -330,7 +391,71 @@ void *mm_realloc(void *ptr, size_t size) {
   return newptr;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////
+void *extend_heap(size_t size) {
+  LOG("in %s with size = %zu\n", __func__, size);
+
+  print_heaplist();
+  print_freelist();
+
+  char *bp;
+  size = ALIGN(size);
+  if ((bp = mem_sbrk(size)) == (char *)-1) {
+    return NULL;
+  }
+
+  /* Initialize free block header/footer and the epilogue header */
+  SET(HEADER(bp), PACK(size, 0));
+  SET(FOOTER(bp), PACK(size, 0));
+  SET(HEADER(NEXT_BLOCK(bp)), PACK(0, 1));
+
+  ATTACH(FREE_LIST(SIZE_CLASS_ID(size)), NODE(bp));
+
+  print_heaplist();
+  print_freelist();
+
+  /* Coalesce if the previous block was free */
+  return coalesce(bp);
+}
+
+void *find_fit(size_t size) {
+  print_heaplist();
+  print_freelist();
+  // loop through all free lists and check
+  for (size_t class_id = SIZE_CLASS_ID(size); class_id < SIZE_CLASSES;
+       class_id++) {
+    void *bp = FREE_LIST(class_id)->next;
+    while (NODE(bp)->next && GET_SIZE(HEADER(bp)) < size) {
+      bp = NODE(bp)->next;
+    }
+    // 说明 bp 不是最后一个节点
+    if (NODE(bp)->next) {
+      return bp;
+    }
+  }
+  // not found
+  return NULL;
+}
+
+void place(void *bp, size_t size) {
+  LOG("in %s with block = %s, size = %zu\n", __func__, to_string(bp), size);
+  print_freelist();
+  print_heaplist();
+  DETACH(NODE(bp));
+  size_t block_size = GET_SIZE(HEADER(bp));
+  if ((block_size - size) >= MIN_BLOCK_SIZE) {
+    SET(HEADER(bp), PACK(size, 1));
+    SET(FOOTER(bp), PACK(size, 1));
+    bp = NEXT_BLOCK(bp);
+    SET(HEADER(bp), PACK(block_size - size, 0));
+    SET(FOOTER(bp), PACK(block_size - size, 0));
+    ATTACH(FREE_LIST(SIZE_CLASS_ID(block_size - size)), NODE(bp));
+  } else {
+    SET(HEADER(bp), PACK(block_size, 1));
+    SET(FOOTER(bp), PACK(block_size, 1));
+  }
+  print_freelist();
+  print_heaplist();
+}
 
 void *coalesce(void *bp) {
   LOG("in %s, with block = %s\n", __func__, to_string(bp));
@@ -356,7 +481,7 @@ void *coalesce(void *bp) {
     SET(HEADER(bp), PACK(size, 0));
     SET(FOOTER(next_block), PACK(size, 0));
     // we have to detach node and
-    ATTACH(freelist_header, NODE(bp));
+    ATTACH(FREE_LIST(SIZE_CLASS_ID(size)), NODE(bp));
   } else if (!prev_alloc && next_alloc) {
     LOG("prev is not allocated, next is allocated\n");
     DETACH(NODE(prev_block));
@@ -365,7 +490,7 @@ void *coalesce(void *bp) {
     SET(HEADER(prev_block), PACK(size, 0));
     SET(FOOTER(bp), PACK(size, 0));
     bp = prev_block;
-    ATTACH(freelist_header, NODE(bp));
+    ATTACH(FREE_LIST(SIZE_CLASS_ID(size)), NODE(bp));
   } else {
     LOG("prev is not allocated, next is not allocated\n");
     DETACH(NODE(prev_block));
@@ -375,7 +500,7 @@ void *coalesce(void *bp) {
     SET(HEADER(prev_block), PACK(size, 0));
     SET(FOOTER(next_block), PACK(size, 0));
     bp = prev_block;
-    ATTACH(freelist_header, NODE(bp));
+    ATTACH(FREE_LIST(SIZE_CLASS_ID(size)), NODE(bp));
   }
 
   print_heaplist();
@@ -384,70 +509,6 @@ void *coalesce(void *bp) {
   LOG("end %s\n", __func__);
 
   return bp;
-}
-
-void *extend_heap(size_t size) {
-  LOG("in %s with size = %zu\n", __func__, size);
-
-  print_heaplist();
-  print_freelist();
-
-  char *bp;
-  size = ALIGN(size);
-  if ((bp = mem_sbrk(size)) == (char *)-1) {
-    return NULL;
-  }
-
-  bp = bp - NODE_SIZE;
-  node_ptr epilogue_prev = NODE(bp)->prev;
-
-  /* Initialize free block header/footer and the epilogue header */
-  SET(HEADER(bp), PACK(size, 0));
-  SET(FOOTER(bp), PACK(size, 0));
-  // setup epilogue
-  void *epilogue = NEXT_BLOCK(bp);
-  SET(HEADER(epilogue), PACK(0, 1));
-  epilogue_prev->next = NODE(epilogue);
-  NODE(epilogue)->prev = epilogue_prev;
-  NODE(epilogue)->next = NULL;
-
-  ATTACH(freelist_header, NODE(bp));
-
-  print_heaplist();
-  print_freelist();
-
-  /* Coalesce if the previous block was free */
-  return coalesce(bp);
-}
-
-void *find_fit(size_t size) {
-  //TODO: we can implement best fit, first fit and next fit algorithm here
-  void *bp = freelist_header->next;
-  while (bp && GET_SIZE(HEADER(bp)) < size) {
-    bp = NODE(bp)->next;
-  }
-  return bp;
-}
-
-void place(void *bp, size_t size) {
-  LOG("in %s with block = %s, size = %zu\n", __func__, to_string(bp), size);
-  print_freelist();
-  print_heaplist();
-  DETACH(NODE(bp));
-  size_t block_size = GET_SIZE(HEADER(bp));
-  if ((block_size - size) >= MIN_BLOCK_SIZE) {
-    SET(HEADER(bp), PACK(size, 1));
-    SET(FOOTER(bp), PACK(size, 1));
-    bp = NEXT_BLOCK(bp);
-    SET(HEADER(bp), PACK(block_size - size, 0));
-    SET(FOOTER(bp), PACK(block_size - size, 0));
-    ATTACH(freelist_header, NODE(bp));
-  } else {
-    SET(HEADER(bp), PACK(block_size, 1));
-    SET(FOOTER(bp), PACK(block_size, 1));
-  }
-  print_freelist();
-  print_heaplist();
 }
 
 const char *to_string(void *bp) {
@@ -468,7 +529,7 @@ const char *to_string(void *bp) {
 void print_heaplist() {
   void *bp;
   printf("Heap List [\n");
-  for (bp = freelist_header; GET_SIZE(HEADER(bp)) != 0; bp = NEXT_BLOCK(bp)) {
+  for (bp = heaplist_ptr; GET_SIZE(HEADER(bp)) != 0; bp = NEXT_BLOCK(bp)) {
     printf("  %s\n", to_string(bp));
   }
   printf("  %s\n", to_string(bp));
@@ -476,12 +537,19 @@ void print_heaplist() {
 }
 
 void print_freelist() {
-  printf("Free List [\n");
-  node_ptr curr;
-  for (curr = freelist_header; curr->next != NULL; curr = curr->next) {
-    printf("  %s\n", to_string(curr));
+  printf("Free List[\n");
+  for (size_t i = 0; i < SIZE_CLASSES; i++) {
+    // skip empty free list
+    node_ptr curr = FREE_LIST(i)->next;
+    if (curr->next == NULL) {
+      continue;
+    }
+    printf("  Free List %04zu (%s) [ ", i, get_size_class_name(i));
+    for (; curr->next != NULL; curr = curr->next) {
+      printf("%s ", to_string(curr));
+    }
+    printf("]\n");
   }
-  printf("  %s\n", to_string(curr));
   printf("]\n");
 }
 

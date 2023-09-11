@@ -191,9 +191,9 @@ int mm_init(void) {
   print_freelist();
 
   /* Extend the empty heap with a free block of CHUNK_SIZE bytes */
-  if (extend_heap(CHUNK_SIZE) == NULL) {
-    return -1;
-  }
+  // if (extend_heap(CHUNK_SIZE) == NULL) {
+  //   return -1;
+  // }
 
   print_freelist();
 

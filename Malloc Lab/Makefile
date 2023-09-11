@@ -9,7 +9,7 @@ CC = gcc
 CFLAGS = -Wall -O2 -m32
 # CFLAGS = -Wall -m32 -g
 
-OBJS = mdriver.o mm-explicit.o memlib.o fsecs.o fcyc.o clock.o ftimer.o
+OBJS = mdriver.o mm-segregated-fits.o memlib.o fsecs.o fcyc.o clock.o ftimer.o
 
 mdriver: $(OBJS)
 	$(CC) $(CFLAGS) -o mdriver $(OBJS)
@@ -17,6 +17,7 @@ mdriver: $(OBJS)
 mdriver.o: mdriver.c fsecs.h fcyc.h clock.h memlib.h config.h mm.h
 memlib.o: memlib.c memlib.h
 mm.o: mm.c mm.h memlib.h
+mm-segregated-fits.o: mm-segregated-fits.c mm.h memlib.h
 mm-explicit.o: mm-explicit.c mm.h memlib.h
 mm-implicit.o: mm-implicit.c mm.h memlib.h
 mm-implicit-op.o: mm-implicit-op.c mm.h memlib.h
