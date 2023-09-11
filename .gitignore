@@ -13,10 +13,12 @@ myspin
 mysplit
 mystop
 tsh
-Shell Lab/output
+ShellLab/output
 # output by Malloc Lab
 mdriver
 # output by Proxy Lab
 proxy
-tiny
+ProxyLab/tiny/tiny
 adder
+.proxy
+.noproxy

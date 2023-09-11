@@ -142,7 +142,7 @@ make mdriver
 ./mdriver -t ./traces -v -V -l
 ```
 
-### Traces Files (under `./Malloc Lab/traces`)
+### Traces Files (under `MallocLab/traces`)
 
  0. `amptjp-bal.rep`
  1. `cccp-bal.rep`
@@ -225,7 +225,7 @@ Perf index = 43 (util) + 40 (thru) = 83/100
 
 ### Segregated Free Lists with LIFO order, stand-alone `realloc`
 
-size classes: {1~32},{33~64},{65~128},{129~256},{257~512},{513~1024},{1025~2048},{2049~4096},{4097~inf}
+size classes: {1\~32},{33\~64},{65\~128},{129\~256},{257\~512},{513\~1024},{1025\~2048},{2049\~4096},{4097\~inf}
 
 ```txt
 Results for mm malloc:
