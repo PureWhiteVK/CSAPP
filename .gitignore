@@ -1,4 +1,5 @@
 .vscode/**
+build
 # for debug
 !.vscode/launch.json
 *.a
@@ -19,6 +20,8 @@ mdriver
 # output by Proxy Lab
 proxy
 ProxyLab/tiny/tiny
+ProxyLab/build
 adder
 .proxy
 .noproxy
+# output by Cache Lab

@@ -29,6 +29,10 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Default file permissions are DEF_MODE & ~DEF_UMASK */
 /* $begin createmasks */
 #define DEF_MODE   S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP|S_IROTH|S_IWOTH
@@ -64,7 +68,7 @@ extern char **environ; /* Defined by libc */
 void unix_error(char *msg);
 void posix_error(int code, char *msg);
 void dns_error(char *msg);
-void gai_error(int code, char *msg);
+void csapp_gai_error(int code, char *msg);
 void app_error(char *msg);
 
 /* Process control wrappers */
@@ -193,6 +197,10 @@ int open_listenfd(char *port);
 /* Wrappers for reentrant protocol-independent client/server helpers */
 int Open_clientfd(char *hostname, char *port);
 int Open_listenfd(char *port);
+
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif /* __CSAPP_H__ */
