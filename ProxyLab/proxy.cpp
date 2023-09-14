@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <filesystem>
+#include <list>
 #include <spdlog/fmt/ranges.h>
 #include <spdlog/spdlog.h>
 
@@ -15,6 +16,19 @@ static const char *user_agent_hdr =
     "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:10.0.3) Gecko/20120305 "
     "Firefox/10.0.3\r\n";
 
+struct CacheItem {
+  void *object{};
+  size_t size{};
+};
+
+class LRUCache {
+
+private:
+  size_t capacity{MAX_CACHE_SIZE};
+  size_t size{};
+  std::list<CacheItem> list{};
+};
+
 #define TO_SOCKADDR(x) reinterpret_cast<struct sockaddr *>(&(x))
 
 namespace fs = std::filesystem;
@@ -26,7 +40,8 @@ int main(int argc, char *argv[]) {
   ch::steady_clock::time_point s = ch::steady_clock::now();
   struct hostent *hostent = Gethostbyname(server_domain.c_str());
   ch::steady_clock::time_point t = ch::steady_clock::now();
-  spdlog::info("Gethostbyname costs {:.3f} ms",ch::duration_cast<ch::microseconds>(t-s).count() / 1000.0);
+  spdlog::info("Gethostbyname costs {:.3f} ms",
+               ch::duration_cast<ch::microseconds>(t - s).count() / 1000.0);
   char **h = hostent->h_addr_list;
   std::vector<uint8_t> addr_data;
   addr_data.resize(hostent->h_length);
@@ -62,7 +77,7 @@ int main(int argc, char *argv[]) {
   rio_t rio;
   std::array<char, 8192> buffer;
   int sockfd = Accept(listen_fd, TO_SOCKADDR(remote_addr), &addrlen);
-  // 初始化 buffer 
+  // 初始化 buffer
   Rio_readinitb(&rio, sockfd);
   while (true) {
     // read from remote

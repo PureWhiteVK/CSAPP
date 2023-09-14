@@ -8,13 +8,13 @@
       "name": "Shell Lab / myint",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/Shell Lab/myint",
+      "program": "${workspaceFolder}/ShellLab/myint",
       "args": [
         // will sleep 3 seconds, and sent SIGINT to itself.
         "3"
       ],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/Shell Lab",
+      "cwd": "${workspaceFolder}/ShellLab",
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
@@ -35,7 +35,7 @@
       "name": "Shell Lab / myspin",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/Shell Lab/myspin",
+      "program": "${workspaceFolder}/ShellLab/myspin",
       "args": [
         // will sleep 3 seconds, and exit.
         "3"
@@ -62,13 +62,13 @@
       "name": "Shell Lab / mysplit",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/Shell Lab/mysplit",
+      "program": "${workspaceFolder}/ShellLab/mysplit",
       "args": [
         // will create a child process and make it sleep for 3 seconds, the main process will wait for it and exit.
         "3"
       ],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/Shell Lab",
+      "cwd": "${workspaceFolder}/ShellLab",
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
@@ -89,7 +89,7 @@
       "name": "Shell Lab / mystop",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/Shell Lab/mystop",
+      "program": "${workspaceFolder}/ShellLab/mystop",
       "args": [
         // mock Ctrl + Z input
         // SIGTSTP: Stop typed at terminal
@@ -97,7 +97,7 @@
         "3"
       ],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/Shell Lab",
+      "cwd": "${workspaceFolder}/ShellLab",
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
@@ -118,7 +118,7 @@
       "name": "Shell Lab / tsh",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/Shell Lab/tsh",
+      "program": "${workspaceFolder}/ShellLab/tsh",
       "args": [
         // mock Ctrl + Z input
         // SIGTSTP: Stop typed at terminal
@@ -126,7 +126,7 @@
         "-v"
       ],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/Shell Lab",
+      "cwd": "${workspaceFolder}/ShellLab",
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
@@ -147,7 +147,7 @@
       "name": "Malloc Lab / mdriver (full)",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/Malloc Lab/mdriver",
+      "program": "${workspaceFolder}/MallocLab/mdriver",
       "args": [
         // mock Ctrl + Z input
         // SIGTSTP: Stop typed at terminal
@@ -158,7 +158,7 @@
         "traces"
       ],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/Malloc Lab",
+      "cwd": "${workspaceFolder}/MallocLab",
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
@@ -179,7 +179,7 @@
       "name": "Malloc Lab / mdriver (short1)",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/Malloc Lab/mdriver",
+      "program": "${workspaceFolder}/MallocLab/mdriver",
       "args": [
         // mock Ctrl + Z input
         // SIGTSTP: Stop typed at terminal
@@ -190,7 +190,7 @@
         "short1-bal.rep"
       ],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/Malloc Lab",
+      "cwd": "${workspaceFolder}/MallocLab",
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
@@ -211,7 +211,7 @@
       "name": "Malloc Lab / mdriver (short2)",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/Malloc Lab/mdriver",
+      "program": "${workspaceFolder}/MallocLab/mdriver",
       "args": [
         // mock Ctrl + Z input
         // SIGTSTP: Stop typed at terminal
@@ -222,7 +222,41 @@
         "short2-bal.rep"
       ],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/Malloc Lab",
+      "cwd": "${workspaceFolder}/MallocLab",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "为 gdb 启用整齐打印",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        },
+        {
+          "description": "将反汇编风格设置为 Intel",
+          "text": "-gdb-set disassembly-flavor intel",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
+      "name": "Cache Lab / csim",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/CacheLab/csim",
+      "args": [
+        "-s",
+        "4",
+        "-E",
+        "2",
+        "-b",
+        "4",
+        "-t",
+        "traces/yi.trace",
+        "-v"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/CacheLab",
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",

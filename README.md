@@ -136,6 +136,8 @@ Result
 
 the free block matching policy is `First Fit`
 
+(trace file from [this repo](https://github.com/lsw8075/malloc-lab/blob/master/traces/README.md))
+
 ### Compile and Run
 ```bash
 make mdriver
@@ -161,20 +163,20 @@ make mdriver
 ```txt
 Results for mm malloc:
 trace  valid  util     ops      secs  Kops
- 0       yes   99%    5694  0.004763  1195
- 1       yes   99%    5848  0.004549  1286
- 2       yes   99%    6648  0.006962   955
- 3       yes   99%    5380  0.005181  1038
- 4       yes   66%   14400  0.000073196721
- 5       yes   93%    4800  0.004629  1037
- 6       yes   91%    4800  0.004741  1013
- 7       yes   54%    6000  0.016835   356
- 8       yes   47%    7200  0.020737   347
- 9       yes   27%   14401  0.032043   449
-10       yes   34%   14401  0.001033 13946
-Total          73%   89572  0.101547   882
+ 0       yes   99%    5694  0.004892  1164
+ 1       yes   99%    5848  0.004561  1282
+ 2       yes   99%    6648  0.007152   930
+ 3       yes   99%    5380  0.005479   982
+ 4       yes   99%   14400  0.000096150785
+ 5       yes   92%    4800  0.005235   917
+ 6       yes   91%    4800  0.004949   970
+ 7       yes   54%   12000  0.074404   161
+ 8       yes   47%   24000  0.246816    97
+ 9       yes   27%   14401  0.035009   411
+10       yes   34%   14401  0.001119 12874
+Total          76%  112372  0.389712   288
 
-Perf index = 44 (util) + 40 (thru) = 84/100
+Perf index = 46 (util) + 19 (thru) = 65/100
 ```
 
 ### Implicit Free Lists with Optimized Footer
@@ -184,20 +186,20 @@ we can see a slightly improvement on `util` field compared to native one
 ```txt
 Results for mm malloc:
 trace  valid  util     ops      secs  Kops
- 0       yes   99%    5694  0.004824  1180
- 1       yes   99%    5848  0.004451  1314
- 2       yes   99%    6648  0.006826   974
- 3       yes   99%    5380  0.005047  1066
- 4       yes   66%   14400  0.000083172662
- 5       yes   93%    4800  0.004592  1045
- 6       yes   92%    4800  0.004688  1024
- 7       yes   55%    6000  0.017217   348
- 8       yes   51%    7200  0.019659   366
- 9       yes   27%   14401  0.032257   446
-10       yes   34%   14401  0.001046 13773
-Total          74%   89572  0.100689   890
+ 0       yes   99%    5694  0.004978  1144
+ 1       yes   99%    5848  0.004647  1258
+ 2       yes   99%    6648  0.007072   940
+ 3       yes   99%    5380  0.005321  1011
+ 4       yes   66%   14400  0.000106136235
+ 5       yes   91%    4800  0.005190   925
+ 6       yes   92%    4800  0.004901   979
+ 7       yes   55%   12000  0.074988   160
+ 8       yes   51%   24000  0.232132   103
+ 9       yes   27%   14401  0.033108   435
+10       yes   34%   14401  0.001114 12930
+Total          74%  112372  0.373557   301
 
-Perf index = 44 (util) + 40 (thru) = 84/100
+Perf index = 44 (util) + 20 (thru) = 64/100
 ```
 
 ### Explicit Free Lists with LIFO order and stand-alone `realloc`
@@ -207,20 +209,20 @@ we can see a huge boost on `Kops` field compared with Implicit Free Lists method
 ```txt
 Results for mm malloc:
 trace  valid  util     ops      secs  Kops
- 0       yes   88%    5694  0.000169 33772
- 1       yes   92%    5848  0.000096 61044
- 2       yes   94%    6648  0.000204 32556
- 3       yes   96%    5380  0.000152 35371
- 4       yes   66%   14400  0.000078183673
- 5       yes   87%    4800  0.000387 12410
- 6       yes   85%    4800  0.000387 12419
- 7       yes   54%    6000  0.000236 25456
- 8       yes   47%    7200  0.000113 64000
- 9       yes   37%   14401  0.019387   743
-10       yes   45%   14401  0.000344 41900
-Total          72%   89572  0.021551  4156
+ 0       yes   88%    5694  0.000156 36453
+ 1       yes   92%    5848  0.000099 58892
+ 2       yes   94%    6648  0.000215 30964
+ 3       yes   96%    5380  0.000150 35795
+ 4       yes   99%   14400  0.000092155676
+ 5       yes   87%    4800  0.000359 13356
+ 6       yes   85%    4800  0.000373 12855
+ 7       yes   54%   12000  0.000899 13354
+ 8       yes   47%   24000  0.000960 25005
+ 9       yes   37%   14401  0.020174   714
+10       yes   45%   14401  0.000361 39859
+Total          75%  112372  0.023839  4714
 
-Perf index = 43 (util) + 40 (thru) = 83/100
+Perf index = 45 (util) + 40 (thru) = 85/100
 ```
 
 ### Segregated Free Lists with LIFO order, stand-alone `realloc`
@@ -246,3 +248,49 @@ Total          78%   89572  0.021822  4105
 Perf index = 47 (util) + 40 (thru) = 87/100
 ```
 
+## Cache Lab
+
+LRU Cache and Optimized Matrix Transpose
+
+```bash
+make
+python driver.py 
+```
+Note: the autograder need python2.7 to run auto-grade, please make sure you have python 2.7 installed (recommend installing it from miniconda)
+
+```bash
+conda create -n py27 python=2.7
+conda activate py27
+python driver.py
+```
+
+Result
+```bash
+Part A: Testing cache simulator
+Running ./test-csim
+                        Your simulator     Reference simulator
+Points (s,E,b)    Hits  Misses  Evicts    Hits  Misses  Evicts
+     3 (1,1,1)       9       8       6       9       8       6  traces/yi2.trace
+     3 (4,2,4)       4       5       2       4       5       2  traces/yi.trace
+     3 (2,1,4)       2       3       1       2       3       1  traces/dave.trace
+     3 (2,1,3)     167      71      67     167      71      67  traces/trans.trace
+     3 (2,2,3)     201      37      29     201      37      29  traces/trans.trace
+     3 (2,4,3)     212      26      10     212      26      10  traces/trans.trace
+     3 (5,1,5)     231       7       0     231       7       0  traces/trans.trace
+     6 (5,1,5)  265189   21775   21743  265189   21775   21743  traces/long.trace
+    27
+
+
+Part B: Testing transpose function
+Running ./test-trans -M 32 -N 32
+Running ./test-trans -M 64 -N 64
+Running ./test-trans -M 61 -N 67
+
+Cache Lab summary:
+                        Points   Max pts      Misses
+Csim correctness          27.0        27
+Trans perf 32x32           8.0         8         287
+Trans perf 64x64           8.0         8        1179
+Trans perf 61x67          10.0        10        1992
+          Total points    53.0        53
+```

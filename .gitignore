@@ -25,3 +25,10 @@ adder
 .proxy
 .noproxy
 # output by Cache Lab
+.csim_results
+.marker
+trace.tmp
+trace.f*
+tracegen
+test-trans
+csim

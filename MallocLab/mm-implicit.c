@@ -91,7 +91,7 @@ static void print_freelist() {
   printf("]\n");
 }
 #else
-#define LOG(...) 0
+#define LOG(...) {}
 static void print_freelist() {}
 #endif
 
