@@ -1,0 +1,31 @@
+Accepted connection from (localhost, 57214)
+[2023-09-15 21:05:02.566] [info] recv 47 bytes
+b'GET http://localhost:12734/home.html HTTP/1.1\r\n'
+[2023-09-15 21:05:02.566] [info] parse_result: CONTINUE
+[2023-09-15 21:05:02.566] [info] recv 23 bytes
+b'Host: localhost:12734\r\n'
+[2023-09-15 21:05:02.566] [info] parse_result: CONTINUE
+[2023-09-15 21:05:02.566] [info] recv 25 bytes
+b'User-Agent: curl/7.68.0\r\n'
+[2023-09-15 21:05:02.566] [info] parse_result: CONTINUE
+[2023-09-15 21:05:02.566] [info] recv 13 bytes
+b'Accept: */*\r\n'
+[2023-09-15 21:05:02.566] [info] parse_result: CONTINUE
+[2023-09-15 21:05:02.566] [info] recv 30 bytes
+b'Proxy-Connection: Keep-Alive\r\n'
+[2023-09-15 21:05:02.566] [info] parse_result: CONTINUE
+[2023-09-15 21:05:02.566] [info] recv 2 bytes
+b'\r\n'
+[2023-09-15 21:05:02.566] [info] parse_result: PASS
+[2023-09-15 21:05:02.567] [info] send 187 bytes
+GET /home.html HTTP/1.0
+Connection: close
+Accept: */*
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:10.0.3) Gecko/20120305 Firefox/10.0.3
+Proxy-Connection: close
+Host: localhost
+
+
+[2023-09-15 21:05:02.568] [info] recv 17 bytes
+b'HTTP/1.0 200 OK\r\n'
+[2023-09-15 21:05:02.568] [error] failed to parse response header
